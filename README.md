@@ -12,4 +12,4 @@ See [`AGENTS.md`](./AGENTS.md) for canonical rules (the source of truth is [`fea
 
 ## License
 
-[AGPL-3.0-or-later](./LICENSE)
+[AGPL-3.0-or-later](./LICENSE). See the org-wide [licensing policy](https://github.com/feature-today/.dev/blob/main/LICENSING.md).
