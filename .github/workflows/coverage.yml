@@ -1,0 +1,43 @@
+name: Reusable — Coverage upload
+
+on:
+  workflow_call:
+    inputs:
+      working-directory:
+        type: string
+        default: "."
+      codecov-flags:
+        type: string
+        default: ""
+    secrets:
+      CODECOV_TOKEN:
+        required: false
+
+permissions:
+  contents: read
+
+jobs:
+  upload:
+    name: Upload to Codecov
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ inputs.working-directory }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Download coverage artifact
+        uses: actions/download-artifact@v4
+        with:
+          pattern: coverage-*
+          merge-multiple: true
+          path: ${{ inputs.working-directory }}/coverage
+
+      - name: Upload to Codecov
+        uses: codecov/codecov-action@v6
+        with:
+          files: ${{ inputs.working-directory }}/coverage/lcov.info
+          flags: ${{ inputs.codecov-flags }}
+          fail_ci_if_error: false
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

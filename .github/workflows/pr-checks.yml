@@ -1,0 +1,70 @@
+name: Reusable — PR checks bundle
+
+# Convenience aggregator — calls every other reusable workflow with sensible
+# defaults so each product repo only needs one tiny pr-checks.yml.
+
+on:
+  workflow_call:
+    inputs:
+      node-version:
+        type: string
+        default: "24"
+      pnpm-version:
+        type: string
+        default: "11"
+      working-directory:
+        type: string
+        default: "."
+      coverage:
+        type: boolean
+        default: true
+      audit-level:
+        type: string
+        default: high
+    secrets:
+      CODECOV_TOKEN:
+        required: false
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  ci:
+    uses: feature-today/.github/.github/workflows/ci-node.yml@main
+    with:
+      node-version: ${{ inputs.node-version }}
+      pnpm-version: ${{ inputs.pnpm-version }}
+      working-directory: ${{ inputs.working-directory }}
+      coverage: ${{ inputs.coverage }}
+
+  commits:
+    uses: feature-today/.github/.github/workflows/conventional-commits.yml@main
+    with:
+      validate-pr-title: true
+      require-scope: false
+      pr-comment: error
+
+  audit:
+    uses: feature-today/.github/.github/workflows/security-audit.yml@main
+    with:
+      node-version: ${{ inputs.node-version }}
+      pnpm-version: ${{ inputs.pnpm-version }}
+      working-directory: ${{ inputs.working-directory }}
+      audit-level: ${{ inputs.audit-level }}
+
+  sbom:
+    uses: feature-today/.github/.github/workflows/sbom.yml@main
+    with:
+      node-version: ${{ inputs.node-version }}
+      pnpm-version: ${{ inputs.pnpm-version }}
+      working-directory: ${{ inputs.working-directory }}
+
+  coverage-upload:
+    if: ${{ inputs.coverage }}
+    needs: ci
+    uses: feature-today/.github/.github/workflows/coverage.yml@main
+    with:
+      working-directory: ${{ inputs.working-directory }}
+    secrets:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

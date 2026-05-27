@@ -1,0 +1,58 @@
+name: Bug report
+description: Report a reproducible bug
+title: "bug: <short description>"
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug! Please fill in as much detail as you can.
+  - type: input
+    id: repo
+    attributes:
+      label: Affected repository
+      placeholder: feature-today/my
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Describe the bug clearly.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Minimal reproduction.
+      placeholder: |
+        1. Go to '…'
+        2. Click on '…'
+        3. See error
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: env
+    attributes:
+      label: Environment
+      description: Node, pnpm, OS, browser, package versions
+      placeholder: |
+        - Node: 24.x
+        - pnpm: 11.x
+        - OS: Linux 6.x / macOS 15 / Windows 11
+        - Browser (if relevant): Firefox 130
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs / screenshots
+      description: Optional. Paste any relevant logs or screenshots.
+      render: shell

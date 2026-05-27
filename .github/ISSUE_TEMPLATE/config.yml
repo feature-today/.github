@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Questions & Discussions
+    url: https://github.com/orgs/feature-today/discussions
+    about: Ask questions or discuss ideas with the community.
+  - name: Security vulnerability
+    url: https://github.com/feature-today/.github/security/advisories/new
+    about: Report a security issue privately (do NOT open a public issue).

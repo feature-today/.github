@@ -1,0 +1,39 @@
+name: Reusable — Conventional Commits
+
+on:
+  workflow_call:
+    inputs:
+      validate-pr-title:
+        description: Also validate the PR title
+        type: boolean
+        default: true
+      require-scope:
+        description: Require a scope on every commit
+        type: boolean
+        default: false
+      pr-comment:
+        description: When to post a PR comment (none | error | success | both)
+        type: string
+        default: error
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  commitlint:
+    name: Validate commit messages
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Run conventional-commits action
+        uses: helpers4/action/conventional-commits@v1
+        with:
+          base-sha: ${{ github.event.pull_request.base.sha }}
+          head-sha: ${{ github.event.pull_request.head.sha }}
+          validate-pr-title: ${{ inputs.validate-pr-title }}
+          require-scope: ${{ inputs.require-scope }}
+          pr-comment: ${{ inputs.pr-comment }}

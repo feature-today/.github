@@ -1,0 +1,89 @@
+name: Reusable — CI Node
+
+on:
+  workflow_call:
+    inputs:
+      node-version:
+        description: Node.js version
+        type: string
+        default: "24"
+      pnpm-version:
+        description: pnpm version
+        type: string
+        default: "11"
+      working-directory:
+        description: Working directory
+        type: string
+        default: "."
+      run-build:
+        description: Run `pnpm build`
+        type: boolean
+        default: true
+      run-test:
+        description: Run `pnpm test`
+        type: boolean
+        default: true
+      coverage:
+        description: Use `pnpm test.coverage` instead of `pnpm test`
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    name: Install / Typecheck / Lint / Fmt / Test / Build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ inputs.working-directory }}
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ inputs.pnpm-version }}
+
+      - name: Setup Node.js ${{ inputs.node-version }}
+        uses: actions/setup-node@v5
+        with:
+          node-version: ${{ inputs.node-version }}
+          cache: pnpm
+          cache-dependency-path: ${{ inputs.working-directory }}/pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Lint (oxlint)
+        run: pnpm lint
+
+      - name: Format check (oxc-formatter)
+        run: pnpm fmt.check
+
+      - name: Test
+        if: ${{ inputs.run-test }}
+        run: |
+          if [ "${{ inputs.coverage }}" = "true" ]; then
+            pnpm test.coverage
+          else
+            pnpm test
+          fi
+
+      - name: Upload coverage artifact
+        if: ${{ inputs.run-test && inputs.coverage }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-${{ github.sha }}
+          path: ${{ inputs.working-directory }}/coverage/
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Build
+        if: ${{ inputs.run-build }}
+        run: pnpm build
