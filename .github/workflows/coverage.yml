@@ -27,14 +27,14 @@ jobs:
       - uses: actions/checkout@v6
 
       - name: Download coverage artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           pattern: coverage-*
           merge-multiple: true
           path: ${{ inputs.working-directory }}/coverage
 
       - name: Upload to Codecov
-        uses: codecov/codecov-action@v6
+        uses: codecov/codecov-action@v7
         with:
           files: ${{ inputs.working-directory }}/coverage/lcov.info
           flags: ${{ inputs.codecov-flags }}
